@@ -1,0 +1,54 @@
+name: Build Flatpak
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  flatpak:
+    name: Build x86_64 bundle
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
+      options: --privileged
+    steps:
+      - name: Check out commit
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Read PreForm version from manifest
+        id: preform
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+
+          manifest = json.loads(subprocess.check_output(
+              ["flatpak-builder", "--show-manifest", "com.formlabs.PreForm.yml"],
+              text=True,
+          ))
+          module = next(m for m in manifest["modules"] if m["name"] == "preform")
+          version = module["build-options"]["env"]["PF_VER"]
+          if not re.fullmatch(r"[0-9]+(?:\.[0-9]+)+", version):
+              raise SystemExit(f"Invalid PreForm version: {version!r}")
+          bundle = f"PreForm-{version}-x86_64-wine.flatpak"
+          print(f"Building {bundle}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              print(f"bundle={bundle}", file=output)
+          PY
+
+      - name: Build Flatpak bundle
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          manifest-path: com.formlabs.PreForm.yml
+          bundle: ${{ steps.preform.outputs.bundle }}
+          arch: x86_64
+          branch: stable
+          upload-artifact: true
+          artifact-name: ${{ steps.preform.outputs.bundle }}

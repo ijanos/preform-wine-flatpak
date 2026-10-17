@@ -10,6 +10,17 @@ Host Wine is not required.
 I work for Formlabs, but this is an independent personal project, not an official Formlabs project. 
 It was created using only publicly available tools; no internal Formlabs tools or source code were used.
 
+## Install from a release
+
+Download `PreForm-<version>-x86_64-wine.flatpak` from a GitHub release, then install and run
+it (replace the version below with the one you downloaded):
+
+```sh
+flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install --user ./PreForm-3.64.1.664-x86_64-wine.flatpak
+flatpak run com.formlabs.PreForm
+```
+
 ## Build and run
 
 Install `flatpak` and `flatpak-builder` with your distribution's package manager then run: 
