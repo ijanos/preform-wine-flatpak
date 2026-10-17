@@ -12,11 +12,19 @@ It was created using only publicly available tools; no internal Formlabs tools o
 
 ## Install from a release
 
-Download `PreForm-<version>-x86_64-wine.flatpak` from a GitHub release, then install and run
-it (replace the version below with the one you downloaded):
+Download `PreForm-<version>-x86_64-wine.flatpak` from a [GitHub release](https://github.com/ijanos/preform-wine-flatpak/releases). 
+
+Hopefully double-clicking the file will install it, but if not, you can use the commandline:
+
+Do this once to enable Flathub (if you haven't already):
 
 ```sh
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+```
+
+then install and run these commands (replace the version below with the one you downloaded):
+
+```sh
 flatpak install --user ./PreForm-3.64.1.664-x86_64-wine.flatpak
 flatpak run com.formlabs.PreForm
 ```
