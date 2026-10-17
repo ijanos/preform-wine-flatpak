@@ -14,7 +14,18 @@ jobs:
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
       options: --privileged
+      # These are unused host SDKs, separate from the Flatpak build container.
+      volumes:
+        - /usr/share/dotnet:/host-dotnet
+        - /usr/local/lib/android:/host-android
+        - /opt/hostedtoolcache:/host-toolcache
     steps:
+      - name: Free runner disk space
+        run: |
+          df -h /
+          find /host-dotnet /host-android /host-toolcache -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+          df -h /
+
       - name: Check out commit
         uses: actions/checkout@v6
         with:

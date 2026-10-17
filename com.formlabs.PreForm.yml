@@ -74,10 +74,12 @@ modules:
     build-commands:
       - python3 extract-installer.py installer.exe PreForm_setup.msi
       - msiextract --directory unpacked PreForm_setup.msi
+      - rm PreForm_setup.msi
       - test -f "unpacked/Formlabs/PreForm/$PF_VER/PreForm.exe"
       - test -f "unpacked/Formlabs/PreForm/$PF_VER/plugins/platforms/qwindows.dll"
       - mkdir -p /app/opt/preform/current
       - cp -a "unpacked/Formlabs/PreForm/$PF_VER/." /app/opt/preform/current/
+      - rm -rf unpacked
       - install -m644 qt.conf /app/opt/preform/current/qt.conf
       # Wine 11.0 lacks Windows' system icuuc.dll. Provide the official ICU
       # runtime and a forwarder for the unversioned C exports used by Qt.
@@ -94,7 +96,7 @@ modules:
       - install -Dm644 com.formlabs.PreForm.desktop /app/share/applications/com.formlabs.PreForm.desktop
       - install -Dm644 com.formlabs.PreForm.metainfo.xml /app/share/metainfo/com.formlabs.PreForm.metainfo.xml
       # The main executable contains the original 256px app icon as a PNG.
-      - 7zz e -so "unpacked/Formlabs/PreForm/$PF_VER/PreForm.exe" .rsrc/ICON/10 > preform.png
+      - 7zz e -so /app/opt/preform/current/PreForm.exe .rsrc/ICON/10 > preform.png
       - install -Dm644 preform.png /app/share/icons/hicolor/256x256/apps/com.formlabs.PreForm.png
     sources:
       - type: file
