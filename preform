@@ -1,0 +1,42 @@
+#!/bin/bash
+set -euo pipefail
+
+export WINEPREFIX="${XDG_DATA_HOME:?}/wine"
+export WINEARCH=win64
+export WINEDEBUG="${WINEDEBUG:-fixme-all}"
+# Native Qt needs neither Mono (mscoree) nor Gecko (mshtml). Disable them for
+# every Wine invocation, including automatic prefix updates during startup.
+export WINEDLLOVERRIDES="${WINEDLLOVERRIDES:+$WINEDLLOVERRIDES;}winemenubuilder.exe,mscoree,mshtml=d"
+
+mkdir -p "$WINEPREFIX"
+marker="$WINEPREFIX/.preform-wine-ready"
+# Run the actual application directly, bypassing the updater/version launcher.
+executable=/app/opt/preform/current/PreForm.exe
+if [[ ! -f "$executable" ]]; then
+    echo "PreForm executable is missing from the Flatpak: $executable" >&2
+    exit 1
+fi
+
+# Only Wine's per-user state needs initializing; PreForm is already unpacked.
+exec 9>"$WINEPREFIX/.preform-init.lock"
+flock 9
+if [[ ! -f "$marker" ]]; then
+    wineboot -u
+    wineserver -w
+    wine reg add 'HKCU\Software\Wine' /v Version /t REG_SZ /d win10 /f
+    touch "$marker"
+fi
+flock -u 9
+exec 9>&-
+
+# Convert Linux file arguments for Windows, preserving application options.
+args=()
+for argument in "$@"; do
+    if [[ -e "$argument" ]]; then
+        args+=("$(winepath -w "$argument")")
+    else
+        args+=("$argument")
+    fi
+done
+cd "$(dirname "$executable")"
+exec wine "$executable" "${args[@]}"

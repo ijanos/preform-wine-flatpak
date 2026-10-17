@@ -1,0 +1,127 @@
+app-id: com.formlabs.PreForm
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+base: org.winehq.Wine
+base-version: stable-25.08
+command: preform
+separate-locales: false
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.mingw-w64
+  - org.freedesktop.Sdk.Extension.vala
+
+build-options:
+  append-path: /usr/lib/sdk/mingw-w64/bin:/usr/lib/sdk/vala/bin
+  prepend-ld-library-path: /usr/lib/sdk/vala/lib
+
+# Retain the Wine base's compatibility extensions.
+inherit-extensions:
+  - org.freedesktop.Platform.Compat.i386
+  - org.freedesktop.Platform.GL32
+
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --share=network
+  - --device=all
+  - --allow=multiarch
+  - --filesystem=xdg-documents
+  - --filesystem=xdg-download
+  - --env=WINEDLLOVERRIDES=winemenubuilder.exe,mscoree,mshtml=d
+
+modules:
+  # Build-time tools only: all their installed files are removed at cleanup.
+  # valac/vapigen come from the prebuilt Vala SDK extension.
+  - name: gcab
+    buildsystem: meson
+    config-opts:
+      - -Ddocs=false
+      - -Dtests=false
+    cleanup:
+      - '*'
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/gcab/1.6/gcab-1.6.tar.xz
+        sha256: 2f0c9615577c4126909e251f9de0626c3ee7a152376c15b5544df10fc87e560b
+  - name: libgsf
+    config-opts:
+      - --disable-introspection
+      - --disable-gtk-doc
+    cleanup:
+      - '*'
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/libgsf/1.14/libgsf-1.14.53.tar.xz
+        sha256: 0eb59a86e0c50f97ac9cfe4d8cc1969f623f2ae8c5296f2414571ff0a9e8bcba
+  - name: msitools
+    buildsystem: meson
+    # msiextract is built only when introspection is enabled.
+    config-opts:
+      - -Dintrospection=true
+    cleanup:
+      - '*'
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/msitools/0.106/msitools-0.106.tar.xz
+        sha256: 1ed34279cf8080f14f1b8f10e649474125492a089912e7ca70e59dfa2e5a659b
+  - name: preform
+    buildsystem: simple
+    build-options:
+      env:
+        PF_VER: '3.64.1.664'
+    only-arches:
+      - x86_64
+    build-commands:
+      - python3 extract-installer.py installer.exe PreForm_setup.msi
+      - msiextract --directory unpacked PreForm_setup.msi
+      - test -f "unpacked/Formlabs/PreForm/$PF_VER/PreForm.exe"
+      - test -f "unpacked/Formlabs/PreForm/$PF_VER/plugins/platforms/qwindows.dll"
+      - mkdir -p /app/opt/preform/current
+      - cp -a "unpacked/Formlabs/PreForm/$PF_VER/." /app/opt/preform/current/
+      - install -m644 qt.conf /app/opt/preform/current/qt.conf
+      # Wine 11.0 lacks Windows' system icuuc.dll. Provide the official ICU
+      # runtime and a forwarder for the unversioned C exports used by Qt.
+      - x86_64-w64-mingw32-dlltool --input-def icuuc.def --output-exp icuuc.o
+      - x86_64-w64-mingw32-ld --shared --entry 0 -o icuuc.dll icuuc.o
+      - install -m644 icuuc.dll msicu/runtimes/win-x64/native/icuuc72.dll msicu/runtimes/win-x64/native/icudt72.dll /app/opt/preform/current/
+      - install -Dm644 msicu/LICENSE /app/share/licenses/com.formlabs.PreForm/icu-LICENSE
+      # Match newer Wine's no-op multicast-query APIs instead of Wine 11.0's
+      # fatal unimplemented-function exception. Automatic discovery is disabled.
+      - x86_64-w64-mingw32-gcc -Wall -Wextra -Werror -shared -nostdlib -Wl,--entry,0 -o pf-dns.dll preform-dns.c preform-dns.def
+      - install -m644 pf-dns.dll /app/opt/preform/current/pf-dns.dll
+      - python3 patch-dns-import.py /app/opt/preform/current/PreForm.exe
+      - install -Dm755 preform /app/bin/preform
+      - install -Dm644 com.formlabs.PreForm.desktop /app/share/applications/com.formlabs.PreForm.desktop
+      - install -Dm644 com.formlabs.PreForm.metainfo.xml /app/share/metainfo/com.formlabs.PreForm.metainfo.xml
+      # The main executable contains the original 256px app icon as a PNG.
+      - 7zz e -so "unpacked/Formlabs/PreForm/$PF_VER/PreForm.exe" .rsrc/ICON/10 > preform.png
+      - install -Dm644 preform.png /app/share/icons/hicolor/256x256/apps/com.formlabs.PreForm.png
+    sources:
+      - type: file
+        url: https://downloads.formlabs.com/PreForm/Release/3.64.1/PreForm_win_3.64.1_release_releaser_664_136463.exe
+        sha256: 12914059f493624b008a1d2e32968fddf0460f53a7ade88d6f15a58a03db1db1
+        dest-filename: installer.exe
+      - type: file
+        path: extract-installer.py
+      - type: file
+        path: preform
+      - type: file
+        path: qt.conf
+      - type: file
+        path: icuuc.def
+      - type: file
+        path: preform-dns.c
+      - type: file
+        path: preform-dns.def
+      - type: file
+        path: patch-dns-import.py
+      - type: archive
+        url: https://api.nuget.org/v3-flatcontainer/microsoft.icu.icu4c.runtime.win-x64/72.1.0.3/microsoft.icu.icu4c.runtime.win-x64.72.1.0.3.nupkg
+        sha256: ad67e8b8b3d519eaf15d4969a32814cf6e34b81d730f4074b424c69a4ea34cf1
+        archive-type: zip
+        strip-components: 0
+        dest: msicu
+      - type: file
+        path: com.formlabs.PreForm.desktop
+      - type: file
+        path: com.formlabs.PreForm.metainfo.xml

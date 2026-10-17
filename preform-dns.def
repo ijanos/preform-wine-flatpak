@@ -1,0 +1,5 @@
+LIBRARY pf-dns.dll
+EXPORTS
+    DnsFree=dnsapi.DnsFree
+    DnsStartMulticastQuery
+    DnsStopMulticastQuery

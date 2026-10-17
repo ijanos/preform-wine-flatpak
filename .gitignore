@@ -1,0 +1,12 @@
+# Flatpak build cache, output, and local repository
+/.flatpak-builder/
+/build-dir/
+/repo/
+*.flatpak
+
+# Downloaded PreForm installers
+/PreForm_win_*.exe
+
+# Python bytecode
+__pycache__/
+*.py[cod]

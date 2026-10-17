@@ -1,0 +1,24 @@
+; Qt6Core imports Windows' unversioned ICU C interface. Forward those exports
+; to Microsoft's ICU 72 redistributable without modifying either DLL.
+LIBRARY icuuc.dll
+EXPORTS
+    UCNV_TO_U_CALLBACK_SUBSTITUTE=icuuc72.UCNV_TO_U_CALLBACK_SUBSTITUTE_72
+    UCNV_FROM_U_CALLBACK_SUBSTITUTE=icuuc72.UCNV_FROM_U_CALLBACK_SUBSTITUTE_72
+    ucnv_open=icuuc72.ucnv_open_72
+    ucnv_close=icuuc72.ucnv_close_72
+    ucnv_reset=icuuc72.ucnv_reset_72
+    ucnv_getMaxCharSize=icuuc72.ucnv_getMaxCharSize_72
+    ucnv_getName=icuuc72.ucnv_getName_72
+    ucnv_getToUCallBack=icuuc72.ucnv_getToUCallBack_72
+    ucnv_getFromUCallBack=icuuc72.ucnv_getFromUCallBack_72
+    ucnv_setToUCallBack=icuuc72.ucnv_setToUCallBack_72
+    ucnv_setFromUCallBack=icuuc72.ucnv_setFromUCallBack_72
+    ucnv_fromUnicode=icuuc72.ucnv_fromUnicode_72
+    ucnv_toUnicode=icuuc72.ucnv_toUnicode_72
+    ucnv_countAvailable=icuuc72.ucnv_countAvailable_72
+    ucnv_getAvailableName=icuuc72.ucnv_getAvailableName_72
+    ucnv_cbToUWriteUChars=icuuc72.ucnv_cbToUWriteUChars_72
+    ucnv_cbFromUWriteUChars=icuuc72.ucnv_cbFromUWriteUChars_72
+    ucnv_toUCountPending=icuuc72.ucnv_toUCountPending_72
+    ucnv_fromUCountPending=icuuc72.ucnv_fromUCountPending_72
+    ucnv_getStandardName=icuuc72.ucnv_getStandardName_72

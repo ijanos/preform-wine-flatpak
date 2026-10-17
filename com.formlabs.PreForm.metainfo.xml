@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.formlabs.PreForm</id>
+  <name>PreForm</name>
+  <summary>Prepare models for Formlabs 3D printers</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LicenseRef-proprietary</project_license>
+  <description>
+    <p>PreForm prepares 3D models for printing with Formlabs printers.
+    This unofficial package runs the Windows application using Wine.</p>
+  </description>
+  <launchable type="desktop-id">com.formlabs.PreForm.desktop</launchable>
+  <url type="homepage">https://formlabs.com/software/</url>
+  <content_rating type="oars-1.1"/>
+</component>

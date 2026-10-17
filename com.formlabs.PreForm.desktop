@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=PreForm
+Comment=Prepare models for Formlabs 3D printers
+Exec=preform %F
+Icon=com.formlabs.PreForm
+Terminal=false
+Categories=Graphics;3DGraphics;Engineering;
+StartupNotify=true
