@@ -1,4 +1,4 @@
-"""Route PreForm 3.64.1.664's DNS imports through a compatibility DLL."""
+"""Route PreForm 3.64.2.665's DNS imports through a compatibility DLL."""
 
 import hashlib
 from pathlib import Path
@@ -8,14 +8,14 @@ import sys
 # Revalidate the DNS imports and update this hash when upgrading PreForm.
 # The compatibility DLL supports DnsFree, DnsStartMulticastQuery, and
 # DnsStopMulticastQuery.
-EXPECTED_SHA256 = '074709c9b10e08f028b4c2f56f8022d246d954fa93ad80c1d5e680778bca4946'
+EXPECTED_SHA256 = 'b5829d677ea0dcf7f750ed39f40729182aeb7ad69298a924a6ab2db170d5d5df'
 
 
 def patch(path):
     path = Path(path)
     data = path.read_bytes()
     if hashlib.sha256(data).hexdigest() != EXPECTED_SHA256:
-        raise ValueError('Expected the unmodified PreForm 3.64.1.664 executable')
+        raise ValueError('Expected the unmodified PreForm 3.64.2.665 executable')
 
     original = b'DNSAPI.dll\0'
     replacement = b'pf-dns.dll\0'

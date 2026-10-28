@@ -25,7 +25,7 @@ def extract(installer, destination):
                     cabinets.append(cabinet)
                 offset += 8
         if len(cabinets) != 2:
-            raise ValueError("Expected the two cabinets in the PreForm 3.64.1 bundle")
+            raise ValueError("Expected the two cabinets in the PreForm bundle")
         # WiX stores its manifest in file '0' in the first (bootstrapper) CAB.
         subprocess.run(
             ["cabextract", "-q", "-F", "0", "-d", str(directory), str(cabinets[0])],
