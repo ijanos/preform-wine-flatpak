@@ -68,7 +68,7 @@ modules:
     buildsystem: simple
     build-options:
       env:
-        PF_VER: '3.65.0.671'
+        PF_VER: '3.65.1.672'
     only-arches:
       - x86_64
     build-commands:
@@ -100,8 +100,8 @@ modules:
       - install -Dm644 preform.png /app/share/icons/hicolor/256x256/apps/com.formlabs.PreForm.png
     sources:
       - type: file
-        url: https://downloads.formlabs.com/PreForm/Release/3.65.0/PreForm_win_3.65.0_release_releaser_671_140011.exe
-        sha256: 3373835072c151eb2327b04c4a4e0f893af7607b17ed91eba5f39d0bacede7af
+        url: https://downloads.formlabs.com/PreForm/Release/3.65.1/PreForm_win_3.65.1_release_releaser_672_140371.exe
+        sha256: 7f7c583d92bf4c234435ef3aff5002c543128af2f6ed276bdf08ad15c1ef30d8
         dest-filename: installer.exe
       - type: file
         path: extract-installer.py

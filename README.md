@@ -25,7 +25,7 @@ flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flath
 then install and run these commands (replace the version below with the one you downloaded):
 
 ```sh
-flatpak install --user ./PreForm-3.65.0.671-x86_64-wine.flatpak
+flatpak install --user ./PreForm-3.65.1.672-x86_64-wine.flatpak
 flatpak run com.formlabs.PreForm
 ```
 
