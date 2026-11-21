@@ -14,8 +14,10 @@ jobs:
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-25.08
       options: --privileged
-      # These are unused host SDKs, separate from the Flatpak build container.
       volumes:
+        # Let Docker seed a writable volume with the image’s system Flatpaks.
+        - flatpak-system-${{ github.run_id }}-${{ github.run_attempt }}:/var/lib/flatpak
+        # Unused host SDKs removed to free runner disk space.
         - /usr/share/dotnet:/host-dotnet
         - /usr/local/lib/android:/host-android
         - /opt/hostedtoolcache:/host-toolcache
